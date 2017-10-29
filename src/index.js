@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
+import enemyImg from "./img/enemy.png";
 
 class Status extends Component {
   constructor() {
@@ -12,7 +13,8 @@ class Status extends Component {
       phase: "select",
       tagname: "",
       enemy_damage: "",
-      ally_damage: ""
+      ally_damage: "",
+      answer: ""
     }
     
     this.attack = this.attack.bind(this);  
@@ -20,6 +22,7 @@ class Status extends Component {
     this.changeSelectState = this.changeSelectState.bind(this);
     this.enemyAttack = this.enemyAttack.bind(this);
     this.allyAttack = this.allyAttack.bind(this);
+    this.answer = this.answer.bind(this);
   }
     
   getDamage() {
@@ -45,20 +48,33 @@ class Status extends Component {
   allyAttack() {
     return Math.floor( Math.random() * (320 - 290) ) + 290;
   }
+  
+  answer() {
+    const answers = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "bbasefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body"];
+    var rand = Math.floor( Math.random() * answers.length - 1);
+    return answers[rand];
+  }
     
   attack() {
     var setState = this.setState;
     var self = this;
+    var answer = this.answer();
+    var damage;
     
-    
+    this.setState({answer: answer});
     this.setState({phase: "attack"});
     window.setTimeout(function() {
-      self.setState({tagname: document.forms.attack_form.attack_input.value});
-      var damage = self.allyAttack();
+      self.setState({tagname: answer});
+      
+      if(document.forms.attack_form.attack_input.value === answer){
+        damage = self.allyAttack();
+        self.setState({enemy_hp: self.state.enemy_hp - damage})
+      }else{
+        damage = 0;
+      }
       self.setState({ally_damage: damage});
-      self.setState({enemy_hp: self.state.enemy_hp - damage})
       self.setState({phase: "ally_attack"});
-    }, 500);
+    }, 2500);
     
   }
   
@@ -76,7 +92,7 @@ class Status extends Component {
         <div className="display_wrapper">
           <TeamMembers hp={this.state.ally_hp}/>
           <Enemy />
-          <Form />
+          <Form answer={this.state.answer}/>
         </div>
       )
     }else if(this.state.phase === "ally_attack") {
@@ -146,7 +162,7 @@ class Enemy extends Component {
   render() {
     return(
       <div className="enemy">
-      
+        <img src={enemyImg} className="enemy_img"/>
       </div>
     )
   }
@@ -165,7 +181,7 @@ class Menu extends Component {
           </ul>
         </div>
         <div className="enemy_list border_style">
-        
+          うごくせきぞう<span>ー１ひき</span>
         </div>
       </div>
     )
@@ -175,9 +191,14 @@ class Menu extends Component {
 class Form extends Component {
   render() {
     return(
-      <form id="attack_form">
-        <input type="text" id="attack_input" autoFocus autocomplete="off" />
-      </form>
+      <div>
+        <div className="weak_point">
+          じゃくてん：{this.props.answer}
+        </div>
+        <form id="attack_form">
+          <input type="text" id="attack_input" autoFocus autocomplete="off" />
+        </form>
+      </div>
     )
   }
 }
@@ -198,7 +219,7 @@ class EnemyAttackLog extends Component {
     console.log(this.props.damage)
     return(
       <div className="enemy_attack_log border_style" onClick={this.props.changeSelectState}>
-        エネミーのこうげき！<br />
+        うごくせきぞうのこうげき！<br />
         {toFullWidth(this.props.damage + "")}のダメージ！！
       </div>
     )
