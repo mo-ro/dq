@@ -4,6 +4,9 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 import enemyImg from "./img/enemy.png";
 
+// input要素を取得する
+// input要素を取得する
+
 class Status extends Component {
   constructor() {
     super();
@@ -22,7 +25,7 @@ class Status extends Component {
     this.changeSelectState = this.changeSelectState.bind(this);
     this.enemyAttack = this.enemyAttack.bind(this);
     this.allyAttack = this.allyAttack.bind(this);
-    this.answer = this.answer.bind(this);
+    // this.answer = this.answer.bind(this);
   }
     
   getDamage() {
@@ -49,33 +52,75 @@ class Status extends Component {
     return Math.floor( Math.random() * (320 - 290) ) + 290;
   }
   
-  answer() {
-    const answers = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "bbasefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body"];
-    var rand = Math.floor( Math.random() * answers.length - 1);
-    return answers[rand];
-  }
+  // answer() {
+  //   const answers = ["moro", "maika", "maika", "time", "applet", "area", "uma", "maika", "maika", "b", "base", "moro", "bdi", "moro", "neko", "big", "moro", "uec", "body"];
+  //   var rand = Math.floor( Math.random() * answers.length - 1);
+  //   console.log(rand)
+  //   console.log(answers[rand])
+  //   return answers[rand];
+  // }
     
-  attack() {
+  attack(e, key) {
     var setState = this.setState;
     var self = this;
-    var answer = this.answer();
+    var answer = e.target.accessKey;
     var damage;
+    console.log(e.target.accessKey)
     
     this.setState({answer: answer});
     this.setState({phase: "attack"});
+    // document.getElementById("attack_input").focus();
+    // document.activeElement.blur();
     window.setTimeout(function() {
       self.setState({tagname: answer});
       
-      if(document.forms.attack_form.attack_input.value === answer){
+      if(document.getElementById("attack_input").innerHTML === answer){
         damage = self.allyAttack();
         self.setState({enemy_hp: self.state.enemy_hp - damage})
       }else{
         damage = 0;
       }
+      
       self.setState({ally_damage: damage});
       self.setState({phase: "ally_attack"});
-    }, 2500);
+    }, 3000);
     
+  }
+  
+  componentWillUpdate() {
+    // console.log(document.activeElement)
+    if(document.activeElement.id === "attack_input") {
+      // document.getElementById("attack_input").blur();
+      console.log(document.activeElement)
+      
+
+    }
+
+
+  }
+  
+  componentDidUpdate() {
+    console.log("0")
+    if(document.getElementById("attack_input")) {
+      document.getElementById("attack_input").focus();
+      var input = document.getElementById("attack_input");
+
+      // input要素にイベントリスナを追加する
+      input.addEventListener("keyup", function(){
+          // inputの値が[ぁ-ん]のみで構成されている、つまり全てひらがなであれば
+          if( this.innerHTML.match(/^[ぁ-ん]+$/) ){
+              // フォーカスを奪って
+              this.blur();
+              var _e = document.createEvent("KeyboardEvent");
+          _e.initKeyboardEvent("keydown", true, true, null, false, false, false, false, 13, 0);
+          document.getElementById("attack_input").dispatchEvent(_e);
+              // フォーカスを返す
+              // this.focus();
+          }
+      });
+
+
+    }
   }
   
   render() {
@@ -174,10 +219,22 @@ class Menu extends Component {
       <div className="menu">
         <div className="action_list border_style">
           <ul className="menu_lists">
-            <li className="menu_list" onClick={this.props.attack}>たたかう</li>
-            <li className="menu_list">じゅもん</li>
-            <li className="menu_list">どうぐ</li>
-            <li className="menu_list">にげる</li>
+            <li className="menu_list menu_attack">たたかう
+              <div className="list_hover border_style">
+                <ul>
+                  <li accessKey="あるてまそーど" onClick={this.props.attack}>アルテマソード</li>
+                  <li accessKey="ぎがすらっしゅ" onClick={this.props.attack}>ギガスラッシュ</li>
+                  <li accessKey="かいはざん" onClick={this.props.attack}>かいはざん</li>
+                  <li accessKey="だいちざん" onClick={this.props.attack}>だいちざん</li>
+                  <li accessKey="くうれつざん" onClick={this.props.attack}>くうれつざん</li>
+                  <li accessKey="たいがーくろー" onClick={this.props.attack}>タイガークロー</li>
+                  <li accessKey="ぎがくろすぶれいく" onClick={this.props.attack}>ギガクロスブレイク</li>
+                </ul>
+              </div>
+            </li>
+            <li className="menu_list menu_magic">じゅもん</li>
+            <li className="menu_list menu_item">どうぐ</li>
+            <li className="menu_list menu_dash">にげる</li>
           </ul>
         </div>
         <div className="enemy_list border_style">
@@ -196,7 +253,7 @@ class Form extends Component {
           じゃくてん：{this.props.answer}
         </div>
         <form id="attack_form">
-          <input type="text" id="attack_input" autoFocus autocomplete="off" />
+          <div contentEditAble="true" autoFocus id="attack_input"/>
         </form>
       </div>
     )
