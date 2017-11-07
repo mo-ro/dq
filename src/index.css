@@ -204,6 +204,10 @@
   cursor: pointer;
 }
 
+.complete {
+  color: red;
+}
+
 #attack_input {
   width: 300px;
   height: 200px;
