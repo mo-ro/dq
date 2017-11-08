@@ -204,6 +204,10 @@
   cursor: pointer;
 }
 
+#type_point {
+  display: flex;
+}
+
 .complete {
   color: red;
 }

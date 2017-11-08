@@ -4,6 +4,8 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 import enemyImg from "./img/enemy.png";
 
+
+
 class Status extends Component {
   constructor() {
     super();
@@ -15,8 +17,11 @@ class Status extends Component {
       enemy_damage: "",
       ally_damage: "",
       answer: "",
+      answer_complete: "",
       complete: ""
-    }
+    }  
+    
+    
 
     this.attack = this
       .attack
@@ -33,7 +38,12 @@ class Status extends Component {
     this.allyAttack = this
       .allyAttack
       .bind(this);
+    this.typingAction = this
+      .typingAction
+      .bind(this);
     // this.answer = this.answer.bind(this);
+
+    document.addEventListener("keydown", this.typingAction)
   }
 
   getDamage() {}
@@ -61,6 +71,7 @@ class Status extends Component {
   }
 
   attack(e, key) {
+    var tagname = e.target.textContent;
     var setState = this.setState;
     var self = this;
     var answer = e.target.accessKey;
@@ -70,7 +81,7 @@ class Status extends Component {
     this.setState({answer: answer});
     this.setState({phase: "attack"});
     window.setTimeout(function () {
-      self.setState({tagname: answer});
+      self.setState({tagname: tagname});
 
       if (document.getElementsByClassName("weak_point")[0].textContent === "") {
         damage = self.allyAttack();
@@ -86,6 +97,39 @@ class Status extends Component {
 
   }
 
+  typingAction(event) {
+    var self = this;
+    var answer = this
+      .state
+      .answer
+      .slice();
+    console.log(answer)
+    if (document.getElementById("type_point")) {
+      var input = document.getElementById("type_point");
+      var chart = event.key.toUpperCase();
+      console.log(chart, answer.slice(0,1))
+    // alert(String.fromCharCode(event.keyCode))
+      // if(tkeyname[event.keyCode]){
+      //   console.log("-")
+      // }
+      if (answer.slice(0, 1) === chart) {
+        answer = answer.slice(1)
+        var a = document.getElementsByClassName("weak_point")[0].textContent;
+        var b = document.getElementsByClassName("complete")[0].textContent;
+        b += a.slice(0, 1);
+        this.setState({answer_complete: b});
+        document.getElementsByClassName("complete")[0].textContent = b;
+        a = a.slice(1);
+        this.setState({answer: a});
+        document.getElementsByClassName("weak_point")[0].textContent = a;
+      }
+      //     this.blur();     var _e = document.createEvent("KeyboardEvent");
+      // _e.initKeyboardEvent("keydown", true, true, null, false, false, false, false,
+      // 13, 0); document.getElementById("attack_input").dispatchEvent(_e);
+      // this.focus();
+    }
+  }
+
   componentWillUpdate() {
     // console.log(document.activeElement)
     if (document.activeElement.id === "attack_input") {
@@ -98,36 +142,11 @@ class Status extends Component {
 
   componentDidUpdate() {
     console.log("0")
-    var self = this;
-    var answer = this
-      .state
-      .answer
-      .slice();
-    console.log(answer)
-    if (document.getElementById("type_point")) {
-      var input = document.getElementById("type_point");
-      console.log(input)
-      document.addEventListener("keydown", function (event) {
-        var chart = String.fromCharCode(event.keyCode);
-        // alert(String.fromCharCode(event.keyCode))
-        if (answer.slice(0, 1) === chart) {
-          answer = answer.slice(1)
-          console.log(answer, chart)
-          var a = document.getElementsByClassName("weak_point")[0].textContent;
-          var b = document.getElementsByClassName("complete")[0].textContent;
-          console.log(b)
-          b += a.slice(0, 1);
-          document.getElementsByClassName("complete")[0].textContent = b;
-          a = a.slice(1);
-          document.getElementsByClassName("weak_point")[0].textContent = a;
-        }
-        //     this.blur();     var _e = document.createEvent("KeyboardEvent");
-        // _e.initKeyboardEvent("keydown", true, true, null, false, false, false, false,
-        // 13, 0); document.getElementById("attack_input").dispatchEvent(_e);
-        // this.focus();
-      })
+    
 
-    }
+    //addeventlistenerで一つのinputに複数のイベントハンドラーが登録されている。htmlタグに直接onkeydownを書き込ば解決できる可能性あり。
+    
+      
   }
 
   render() {
@@ -244,12 +263,12 @@ class Menu extends Component {
               <div className="list_hover border_style">
                 <ul>
                   <li accessKey="ARUTEMASO-DO" onClick={this.props.attack}>アルテマソード</li>
-                  <li accessKey="ぎがすらっしゅ" onClick={this.props.attack}>ギガスラッシュ</li>
-                  <li accessKey="かいはざん" onClick={this.props.attack}>かいはざん</li>
-                  <li accessKey="だいちざん" onClick={this.props.attack}>だいちざん</li>
-                  <li accessKey="くうれつざん" onClick={this.props.attack}>くうれつざん</li>
-                  <li accessKey="たいがーくろー" onClick={this.props.attack}>タイガークロー</li>
-                  <li accessKey="ぎがくろすぶれいく" onClick={this.props.attack}>ギガクロスブレイク</li>
+                  <li accessKey="GIGASURASSYU" onClick={this.props.attack}>ギガスラッシュ</li>
+                  <li accessKey="KAIHAZANN" onClick={this.props.attack}>かいはざん</li>
+                  <li accessKey="DAITIZANN" onClick={this.props.attack}>だいちざん</li>
+                  <li accessKey="KUURETUZANN" onClick={this.props.attack}>くうれつざん</li>
+                  <li accessKey="TAIGA-KURO-" onClick={this.props.attack}>タイガークロー</li>
+                  <li accessKey="GIGAKUROSUBUREIKU" onClick={this.props.attack}>ギガクロスブレイク</li>
                 </ul>
               </div>
             </li>
